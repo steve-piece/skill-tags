@@ -1,8 +1,8 @@
 # skill-tags
 
-Generate Cursor command files for skills installed with [skills.sh](https://skills.sh), enabling easy to reference skills using `@skill-name.md` within the chat. This is a workaround to skills being ignored or inconsistently applied.
+Generate Cursor command files for skills installed with [skills.sh](https://skills.sh), making it easy to reference skills using `@skill-name.md` within chat. This is a workaround for skills being ignored or inconsistently applied.
 
-Stay tuned for a more permanent solution to this problem I'm developing an open source community for called [Cursor Kits](https://cursorkits.com). Cursor Kits is something I started before Cursor launched their [Plugin Marketplace](https://cursor.com/marketplace). It's the same idea, but bilt for the community versus integration providers. 
+> Stay tuned for a more permanent solution to this problem: I'm developing an open source community called [Cursor Kits](https://cursorkits.com). Cursor Kits is something I started before Cursor launched their [Plugin Marketplace](https://cursor.com/marketplace). It's the same idea, but built for the community (vs integration providers).
 
 If you're interested in contributing to Cursor Kits, please let me know!
 
@@ -12,7 +12,10 @@ If you're interested in contributing to Cursor Kits, please let me know!
 
 Copy and paste this into your Cursor agent to autoconfigure skill-tags:
 
-````
+<details>
+<summary>Click to expand the full setup prompt</summary>
+
+```text
 Install and configure the skill-tags package for me.
 
 First, confirm with me: should this be a global install (adds `skill-tags` to PATH, recommended for most users) or a local project devDependency? Wait for my answer before proceeding.
@@ -33,7 +36,9 @@ When complete, output a summary that includes:
 - How the auto-trigger works: `skills add <pkg>` now automatically syncs after every install
 - How to manually re-sync at any time: run `skill-tags`
 - A list of the command files that were created so I can see what skills are now referenceable
-````
+```
+
+</details>
 
 ---
 
