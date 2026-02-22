@@ -20,7 +20,7 @@ If you're interested in contributing to Cursor Kits, please let me know!
 - [Manual Sync](#manual-sync)
 - [Skill Sources Scanned](#skill-sources-scanned)
 - [Generated File Format](#generated-file-format)
-- [Skill Metadata Tags](#skill-metadata-tags)
+- [How Categorization Works](#how-categorization-works)
 - [Uninstall](#uninstall)
 - [Requirements](#requirements)
 - [License](#license)
@@ -63,12 +63,9 @@ For more focused context windows, you can group your skills into category-specif
 skill-tags --categories
 ```
 
-This opens a CRUD wizard where you can create, edit, and delete categories. Skill assignment is powered by a two-tier auto-suggestion system:
+This opens an interactive wizard where you can create, edit, and delete categories. Skill assignment is powered by keyword matching against the generated `skill-tags.md` index — all text is lowercased with strict full-word matching and automatic suffix expansion (plurals, gerunds, etc.) to avoid false positives.
 
-1. **`metadata.tags` (high confidence)** — if a skill's `SKILL.md` includes a `metadata.tags` frontmatter field, those tags are matched directly against the category.
-2. **Keyword fallback** — for skills without `metadata.tags`, the skill name and description are scanned against a built-in keyword map.
-
-Suggested skills are pre-selected (`[*]`). You can toggle any skill in or out by number before confirming.
+Suggested skills are pre-selected (`[*]`). Use arrow keys and space to toggle any skill before confirming.
 
 Once configured, every `skill-tags` sync automatically regenerates the category files from the saved config at `~/.cursor/skill-tags-categories.conf`.
 
@@ -79,7 +76,7 @@ Once configured, every `skill-tags` sync automatically regenerates the category 
 @skills-ai-agents.md
 ```
 
-Predefined categories: `frontend`, `backend`, `database`, `testing`, `accessibility`, `performance`, `ai-agents`, `devops`, `design`. You can also create custom categories with any name.
+Predefined categories: `frontend`, `backend`, `database`, `testing`, `design`, `accessibility`, `performance`, `ai-agents`, `devops`, `marketing`, `mobile`, `documentation`. You can also create custom categories with any name.
 
 ---
 
@@ -91,7 +88,7 @@ Copy and paste this into your Cursor agent to autoconfigure skill-tags:
 <summary>Click to expand the full setup prompt</summary>
 
 ```text
-Install and configure the skill-tags package for me.
+Install and configure the `skill-tags` package (npm: https://www.npmjs.com/package/skill-tags, github: https://github.com/steve-piece/skill-tags) for me.
 
 First, confirm with me: should this be a global install (adds `skill-tags` to PATH, recommended for most users) or a local project devDependency? Wait for my answer before proceeding.
 
@@ -211,20 +208,13 @@ The `~/.cursor/commands/skill-tags.md` contains:
 
 This gives the agent a complete map of your skill library when you reference it with `@`.
 
-## Skill Metadata Tags
+## How Categorization Works
 
-skill-tags uses the official `metadata` frontmatter field from the [skills.sh](https://skills.sh) spec to improve auto-categorization. If you are authoring a skill, add `metadata.tags` to improve how it is categorized:
+The `--categories` wizard reads the generated `skill-tags.md` file as its keyword search source. Each skill's title, path, and description are lowercased and matched against category-specific keywords (tool names, framework names, and domain acronyms only — no generic English words).
 
-```yaml
----
-name: my-skill
-description: Does X, Y, Z.
-metadata:
-  tags: [frontend, react, animation]
----
-```
+Matching uses strict full-word boundaries with automatic suffix expansion, so `brainstorm` matches "brainstorming" and `deploy` matches "deployment" — without false positives from partial substring matches.
 
-Skills with `metadata.tags` are surfaced as high-confidence matches in the `--categories` wizard and marked `[*]` with the tag source shown inline. Skills without tags fall back to keyword matching.
+Keywords are intentionally specific (e.g., `vitest`, `playwright`, `supabase`, `tailwind`) rather than generic (e.g., ~~test~~, ~~server~~, ~~component~~) to keep auto-suggestions accurate.
 
 ---
 
@@ -241,7 +231,7 @@ bash uninstall.sh
 ## Requirements
 
 - macOS or Linux (Windows not supported — requires bash)
-- Node.js >=14 (for npm install)
+- Node.js >=18
 - bash or zsh
 - [Cursor IDE](https://cursor.com)
 
