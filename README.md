@@ -1,12 +1,61 @@
 # skill-tags
 
-Generate Cursor command files for skills installed with [skills.sh](https://skills.sh), making it easy to reference skills using `@skill-name.md` within chat. This is a workaround for skills being ignored or inconsistently applied.
+Generate Cursor command files for skills installed with [skills.sh](https://skills.sh), making it easy to reference skills using `@skill-name.md` in Cursor chat.
 
+> [!IMPORTANT]
+> Cursor's Agent Skills feature (currently in beta) only loads skill frontmatter into the agent's context window. The agent then decides whether to read the full `SKILL.md` based on that frontmatter alone — meaning skills are frequently ignored or inconsistently applied. There's also no visibility into whether a skill was triggered at all ([forum discussion](https://forum.cursor.com/t/agent-ignores-skill/149017)).
+
+skill-tags bypasses this by generating a command file per skill in `~/.cursor/commands/`, so you can explicitly attach the full skill content by typing `@skill-name.md`.
+
+> [!TIP]
 > Stay tuned for a more permanent solution to this problem: I'm developing an open source community called [Cursor Kits](https://cursorkits.com). Cursor Kits is something I started before Cursor launched their [Plugin Marketplace](https://cursor.com/marketplace). It's the same idea, but built for the community (vs integration providers).
 
 If you're interested in contributing to Cursor Kits, please let me know!
 
 ---
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+- [Agent Setup Prompt](#agent-setup-prompt)
+- [Install Options](#install-options)
+- [How It Works](#how-it-works)
+- [CLI Reference](#cli-reference)
+- [Manual Sync](#manual-sync)
+- [Skill Sources Scanned](#skill-sources-scanned)
+- [Generated File Format](#generated-file-format)
+- [Uninstall](#uninstall)
+- [Requirements](#requirements)
+- [License](#license)
+
+---
+
+## Quick Start
+
+```bash
+# Install (global, recommended)
+npm install -g skill-tags
+
+# Add the shell auto-trigger wrapper
+skill-tags --setup
+source ~/.zshrc
+
+# Initial sync (generate command files)
+skill-tags
+```
+
+## Usage
+
+In any Cursor chat, attach a skill's full context by referencing the generated command file:
+
+- `@<skill-name>.md`
+
+Example:
+
+```text
+@vercel-react-best-practices.md
+```
 
 ## Agent Setup Prompt
 
@@ -42,15 +91,9 @@ When complete, output a summary that includes:
 
 ---
 
-## The Problem
+## Install Options
 
-Cursor's Agent Skills feature (currently in beta) only loads skill frontmatter into the agent's context window. The agent then decides whether to read the full `SKILL.md` based on that frontmatter alone — meaning skills are frequently ignored or inconsistently applied. There is also no visibility into whether a skill was triggered at all ([forum discussion](https://forum.cursor.com/t/agent-ignores-skill/149017)).
-
-## The Solution
-
-This tool generates a `.md` command file for each installed skill and places it in `~/.cursor/commands/`. You can then type `@skill-name.md` in any Cursor chat to explicitly attach the full skill content as context — bypassing the auto-discovery problem entirely.
-
-## Install via npm
+### Install via npm
 
 ```bash
 # Global install (recommended) — adds `skill-tags` to your PATH
@@ -70,7 +113,7 @@ skill-tags --setup
 source ~/.zshrc
 ```
 
-## Install via curl
+### Install via curl
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/steve-piece/skill-tags/main/install.sh | bash
