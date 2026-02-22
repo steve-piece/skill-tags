@@ -30,8 +30,8 @@ If you're interested in contributing to Cursor Kits, please let me know!
 ## Quick Start
 
 ```bash
-# Install (global, recommended)
-npm install -g skill-tags
+# Install
+npm install skill-tags -g
 
 # Add the shell auto-trigger wrapper
 skill-tags --setup
@@ -90,14 +90,10 @@ Copy and paste this into your Cursor agent to autoconfigure skill-tags:
 ```text
 Install and configure the `skill-tags` package (npm: https://www.npmjs.com/package/skill-tags, github: https://github.com/steve-piece/skill-tags) for me.
 
-First, confirm with me: should this be a global install (adds `skill-tags` to PATH, recommended for most users) or a local project devDependency? Wait for my answer before proceeding.
-
-Once confirmed, use a terminal that runs outside the sandbox with full permissions to avoid permission errors during install. In Cursor, this means using a non-sandboxed terminal session if available (required_permissions: ["all"] if running via agent shell tools).
+Use a terminal that runs outside the sandbox with full permissions to avoid permission errors during install. In Cursor, this means using a non-sandboxed terminal session if available (required_permissions: ["all"] if running via agent shell tools).
 
 Steps to perform:
-1. Install the package based on my preference:
-   - Global: `npm install -g skill-tags`
-   - Local: `npm install --save-dev skill-tags`
+1. Install the package: `npm install skill-tags -g`
 2. Run `skill-tags --setup` to install the `skills()` shell wrapper in my rc file (~/.zshrc or ~/.bash_profile)
 3. Run `skill-tags` to perform an initial sync of all installed skills
 4. Source my shell rc file or instruct me to do so manually
@@ -108,6 +104,7 @@ When complete, output a summary that includes:
 - How the auto-trigger works: `skills add/remove <pkg>` now automatically syncs after every install/removal
 - How to manually re-sync at any time: run `skill-tags`
 - The total number of skills that were indexed
+- (Optional) To create category-specific indexes for more focused context, run `skill-tags --categories`
 ```
 
 </details>
@@ -119,21 +116,15 @@ When complete, output a summary that includes:
 ### Install via npm
 
 ```bash
-# Global install (recommended) — adds `skill-tags` to your PATH
-npm install -g skill-tags
-
-# One-off run without installing
-npx skill-tags
-
-# Project devDependency (adds to package.json)
-npm install --save-dev skill-tags
-```
-
-After global install, set up the shell auto-trigger wrapper:
-
-```bash
+npm install skill-tags -g
 skill-tags --setup
 source ~/.zshrc
+```
+
+### One-off run (no install)
+
+```bash
+npx skill-tags
 ```
 
 ### Install via curl
