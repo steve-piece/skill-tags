@@ -24,9 +24,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stevenlight/skill-tags.git"
+    "url": "git+https://github.com/steve-piece/skill-tags.git"
   },
-  "homepage": "https://github.com/stevenlight/skill-tags#readme",
+  "homepage": "https://github.com/steve-piece/skill-tags#readme",
   "files": [
     "bin/",
     "sync.sh",

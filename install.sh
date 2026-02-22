@@ -3,14 +3,14 @@
 # One-line installer for skill-tags.
 #
 # Usage (curl):
-#   curl -fsSL https://raw.githubusercontent.com/stevenlight/skill-tags/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/steve-piece/skill-tags/main/install.sh | bash
 #
 # Usage (local):
 #   bash install.sh
 
 set -euo pipefail
 
-REPO="https://raw.githubusercontent.com/stevenlight/skill-tags/main"
+REPO="https://raw.githubusercontent.com/steve-piece/skill-tags/main"
 SYNC_SCRIPT_DEST="${HOME}/.cursor/sync-skill-commands.sh"
 CURSOR_COMMANDS_DIR="${HOME}/.cursor/commands"
 WRAPPER_MARKER="# ─── skill-tags / Cursor Skill Command Sync"

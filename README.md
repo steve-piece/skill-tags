@@ -33,7 +33,7 @@ source ~/.zshrc
 ## Install via curl
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/stevenlight/skill-tags/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/steve-piece/skill-tags/main/install.sh | bash
 ```
 
 Then reload your shell:
