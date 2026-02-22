@@ -157,12 +157,13 @@ skills add vercel-labs/agent-skills/vercel-react-best-practices
 ## CLI Reference
 
 ```bash
-skill-tags              # sync all skills, generate/update the command file
-skill-tags --categories # open interactive category wizard (CRUD)
-skill-tags --setup      # install skills() shell wrapper in ~/.zshrc
-skill-tags --global-only  # skip project-level skills
-skill-tags --version    # print version
-skill-tags --help       # show usage
+skill-tags                # sync all skills, generate/update the command file
+skill-tags --categories   # open interactive category wizard (CRUD)
+skill-tags --setup        # install skills() shell wrapper in ~/.zshrc
+skill-tags --global-only  # skip project-level skills (.agents/skills in CWD)
+skill-tags --project-only # scan only .agents/skills in CWD; write to .cursor/commands/skill-tags.md
+skill-tags --version      # print version
+skill-tags --help         # show usage
 ```
 
 ## Manual Sync
