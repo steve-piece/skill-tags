@@ -1,0 +1,39 @@
+{
+  "name": "skill-tags",
+  "version": "1.1.0",
+  "description": "Generate Cursor command files from installed skills for @skill-name.md chat references",
+  "bin": {
+    "skill-tags": "./bin/skill-tags.js"
+  },
+  "scripts": {
+    "postinstall": "node ./bin/postinstall.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "keywords": [
+    "cursor",
+    "skills",
+    "ai",
+    "cursor-ide",
+    "skills.sh",
+    "skill-command-sync",
+    "skill-tags",
+    "agent-skills"
+  ],
+  "author": "Steven Light",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stevenlight/skill-command-sync.git"
+  },
+  "homepage": "https://github.com/stevenlight/skill-command-sync#readme",
+  "files": [
+    "bin/",
+    "sync.sh",
+    "install.sh",
+    "uninstall.sh",
+    "README.md",
+    "LICENSE"
+  ]
+}
