@@ -1,7 +1,7 @@
 {
   "name": "skill-tags",
   "version": "1.1.0",
-  "description": "Generate Cursor command files from installed skills for @skill-name.md chat references",
+  "description": "Generate a Cursor /skill-tags command file indexing all installed agent skills for autonomous context injection",
   "bin": {
     "skill-tags": "bin/skill-tags.js"
   },
@@ -13,12 +13,16 @@
   },
   "keywords": [
     "cursor",
-    "skills",
-    "ai",
     "cursor-ide",
+    "skills",
+    "agent-skills",
     "skills.sh",
     "skill-tags",
-    "agent-skills"
+    "ai",
+    "llm",
+    "mcp",
+    "claude",
+    "codex"
   ],
   "author": "Steven Light",
   "license": "MIT",
