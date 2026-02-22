@@ -1,6 +1,6 @@
 # skill-tags
 
-Generates a single consolidated command file (`@skill-tags.md`) indexing all installed Cursor skills. Reference it in any chat to give the agent a complete directory of your available skills, enabling it to autonomously select and apply the right tools for the task.
+Generates consolidated command files (`@skill-tags.md` and custom `@skills-<category>.md` indexes) for all installed Cursor skills. Reference them in any chat to give the agent a complete directory of your available skills, enabling it to autonomously select and apply the right tools for the task.
 
 > **Coming soon:** Stay tuned for a more permanent solution to this problem: I'm developing an open source community called [Cursor Kits](https://cursorkits.com). Cursor Kits is something I started before Cursor launched their [Plugin Marketplace](https://cursor.com/marketplace). It's the same idea, but built for the community (vs integration providers).
 

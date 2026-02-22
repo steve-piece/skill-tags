@@ -1,7 +1,7 @@
 {
   "name": "skill-tags",
   "version": "1.1.0",
-  "description": "Generate a Cursor /skill-tags command file indexing all installed agent skills for autonomous context injection",
+  "description": "Generates consolidated command files (@skill-tags.md and custom @skills-<category>.md indexes) for all installed Cursor skills.",
   "bin": {
     "skill-tags": "bin/skill-tags.js"
   },
