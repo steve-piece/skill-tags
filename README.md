@@ -1,6 +1,41 @@
 # skill-tags
 
-Generate Cursor command files from installed [skills.sh](https://skills.sh) skills, enabling `@skill-name.md` references in chat for reliable, deterministic skill context injection.
+Generate Cursor command files for skills installed with [skills.sh](https://skills.sh), enabling easy to reference skills using `@skill-name.md` within the chat. This is a workaround to skills being ignored or inconsistently applied.
+
+Stay tuned for a more permanent solution to this problem I'm developing an open source community for called [Cursor Kits](https://cursorkits.com). Cursor Kits is something I started before Cursor launched their [Plugin Marketplace](https://cursor.com/marketplace). It's the same idea, but bilt for the community versus integration providers. 
+
+If you're interested in contributing to Cursor Kits, please let me know!
+
+---
+
+## Agent Setup Prompt
+
+Copy and paste this into your Cursor agent to autoconfigure skill-tags:
+
+````
+Install and configure the skill-tags package for me.
+
+First, confirm with me: should this be a global install (adds `skill-tags` to PATH, recommended for most users) or a local project devDependency? Wait for my answer before proceeding.
+
+Once confirmed, use a terminal that runs outside the sandbox with full permissions to avoid permission errors during install. In Cursor, this means using a non-sandboxed terminal session if available (required_permissions: ["all"] if running via agent shell tools).
+
+Steps to perform:
+1. Install the package based on my preference:
+   - Global: `npm install -g skill-tags`
+   - Local: `npm install --save-dev skill-tags`
+2. Run `skill-tags --setup` to install the `skills()` shell wrapper in my rc file (~/.zshrc or ~/.bash_profile)
+3. Run `skill-tags` to perform an initial sync of all installed skills
+4. Source my shell rc file or instruct me to do so manually
+
+When complete, output a summary that includes:
+- How many command files were generated and where they live (~/.cursor/commands/)
+- How to use them: typing @<skill-name>.md in any Cursor chat attaches the full skill context
+- How the auto-trigger works: `skills add <pkg>` now automatically syncs after every install
+- How to manually re-sync at any time: run `skill-tags`
+- A list of the command files that were created so I can see what skills are now referenceable
+````
+
+---
 
 ## The Problem
 

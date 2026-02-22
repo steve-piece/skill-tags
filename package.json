@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "Generate Cursor command files from installed skills for @skill-name.md chat references",
   "bin": {
-    "skill-tags": "./bin/skill-tags.js"
+    "skill-tags": "bin/skill-tags.js"
   },
   "scripts": {
     "postinstall": "node ./bin/postinstall.js"
