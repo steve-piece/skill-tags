@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 # install.sh
-# One-line installer for skill-command-sync.
+# One-line installer for skill-tags.
 #
 # Usage (curl):
-#   curl -fsSL https://raw.githubusercontent.com/stevenlight/skill-command-sync/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/stevenlight/skill-tags/main/install.sh | bash
 #
 # Usage (local):
 #   bash install.sh
 
 set -euo pipefail
 
-REPO="https://raw.githubusercontent.com/stevenlight/skill-command-sync/main"
+REPO="https://raw.githubusercontent.com/stevenlight/skill-tags/main"
 SYNC_SCRIPT_DEST="${HOME}/.cursor/sync-skill-commands.sh"
 CURSOR_COMMANDS_DIR="${HOME}/.cursor/commands"
-WRAPPER_MARKER="# ─── Cursor Skill Command Sync"
+WRAPPER_MARKER="# ─── skill-tags / Cursor Skill Command Sync"
 
 # ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -86,9 +86,9 @@ install_wrapper() {
 
   cat >> "$rc_file" <<'WRAPPER'
 
-# ─── Cursor Skill Command Sync ─────────────────────────────────────────────────
+# ─── skill-tags / Cursor Skill Command Sync ────────────────────────────────────
 # Wraps `npx skills` to auto-generate @skill-name.md command files after install.
-# Run manually: bash ~/.cursor/sync-skill-commands.sh
+# Run manually: skill-tags   (or: bash ~/.cursor/sync-skill-commands.sh)
 function skills() {
   npx skills "$@"
   local exit_code=$?
@@ -97,7 +97,7 @@ function skills() {
   fi
   return $exit_code
 }
-# ───────────────────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
 WRAPPER
 
   success "Added skills wrapper to ${rc_file/#$HOME/~}"
@@ -105,7 +105,7 @@ WRAPPER
 
 # ─── Main ──────────────────────────────────────────────────────────────────────
 
-printf "\n🔧 Installing Cursor Skill Command Sync...\n\n"
+printf "\n🔧 Installing skill-tags...\n\n"
 
 # 1. Install sync script
 install_sync_script

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # uninstall.sh
-# Removes skill-command-sync: deletes the sync script, removes the shell wrapper,
+# Removes skill-tags: deletes the sync script, removes the shell wrapper,
 # and optionally deletes generated command files.
 
 set -euo pipefail
 
 SYNC_SCRIPT="${HOME}/.cursor/sync-skill-commands.sh"
 COMMANDS_DIR="${HOME}/.cursor/commands"
-MARKER="# ─── Cursor Skill Command Sync"
+MARKER="# ─── skill-tags / Cursor Skill Command Sync"
 
 # Detect shell rc file
 detect_rc() {
@@ -20,7 +20,7 @@ detect_rc() {
 
 RC_FILE="$(detect_rc)"
 
-printf "\n🗑  Cursor Skill Command Sync — Uninstaller\n\n"
+printf "\n🗑  skill-tags — Uninstaller\n\n"
 
 # 1. Remove sync script
 if [[ -f "$SYNC_SCRIPT" ]]; then
