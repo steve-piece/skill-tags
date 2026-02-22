@@ -2,13 +2,11 @@
 
 Generate a single consolidated Cursor command file for all installed skills, making it easy to reference your entire skill library using `@skill-tags.md` in Cursor chat.
 
-> [!IMPORTANT]
-> Cursor's Agent Skills feature only loads skill frontmatter into the agent's context window. Skills are "intelligently applied", but I have had little to no success with them unless I explicitly ask the model to apply the skill.
+> **Note:** Cursor's Agent Skills feature only loads skill frontmatter into the agent's context window. Skills are "intelligently applied", but I have had little to no success with them unless I explicitly ask the model to apply the skill.
 
 skill-tags bypasses this by generating a single command file (`~/.cursor/commands/skill-tags.md`) that lists all available skills, their paths, and their descriptions. By referencing this single file, you give the agent a complete index of all skills on your system and instruct it to autonomously choose the best skill(s) for the current task.
 
-> [!TIP]
-> Stay tuned for a more permanent solution to this problem: I'm developing an open source community called [Cursor Kits](https://cursorkits.com). Cursor Kits is something I started before Cursor launched their [Plugin Marketplace](https://cursor.com/marketplace). It's the same idea, but built for the community (vs integration providers).
+> **Coming soon:** Stay tuned for a more permanent solution to this problem: I'm developing an open source community called [Cursor Kits](https://cursorkits.com). Cursor Kits is something I started before Cursor launched their [Plugin Marketplace](https://cursor.com/marketplace). It's the same idea, but built for the community (vs integration providers).
 
 If you're interested in contributing to Cursor Kits, please let me know!
 
