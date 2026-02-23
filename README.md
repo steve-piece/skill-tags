@@ -24,36 +24,28 @@ If you're interested in contributing to Cursor Kits, please let me know!
 - [How Categorization Works](#how-categorization-works)
 - [Uninstall](#uninstall)
 - [Requirements](#requirements)
+- [Changelog](#changelog)
 - [License](#license)
 
 ---
 
 ## Quick Start
 
-### Global (recommended for most users)
-
-1. **Install:** `npm install skill-tags -g`
-2. **Setup:** `skill-tags --setup` → choose **Global** → `source ~/.zshrc`
-3. **Sync:** `skill-tags` (generates the command file)
-4. **Use:** Reference `@skill-tags.md` in any Cursor chat
+1. **Install:** `npm install skill-tags -g` (or `--save-dev` for project-level)
+2. **Follow the prompts** — choose **Global** or **Project**, then **Auto** or **Manual** sync
+3. **Use:** Reference `@skill-tags.md` in any Cursor chat
 
 ```bash
 npm install skill-tags -g
-skill-tags --setup   # choose: Global
+# Setup wizard runs automatically — choose Global + Auto (recommended)
 source ~/.zshrc
-skill-tags
 ```
 
-### Project-level
-
-1. **Install:** `npm install skill-tags --save-dev`
-2. **Setup:** `npx skill-tags --setup` → choose **Project**
-3. **Use:** Reference `@project-skill-tags.md` in Cursor chat
+For project-level installs:
 
 ```bash
 npm install skill-tags --save-dev
-npx skill-tags --setup   # choose: Project — adds "skills" script to package.json
-
+# Setup wizard runs automatically — choose Project + Auto
 npm run skills add owner/repo/skill-name   # adds skill + auto-syncs
 ```
 
@@ -79,20 +71,25 @@ For more focused context windows, you can group your skills into category-specif
 skill-tags --categories
 ```
 
-This opens an interactive wizard where you can create, edit, and delete categories. Skill assignment is powered by keyword matching against the generated `skill-tags.md` index — all text is lowercased with strict full-word matching and automatic suffix expansion (plurals, gerunds, etc.) to avoid false positives.
-
-Suggested skills are pre-selected (`[*]`). Use arrow keys and space to toggle any skill before confirming.
+This opens an interactive wizard where you can add and remove categories. On save, skill assignment is powered by keyword matching against the generated `skill-tags.md` index — all text is lowercased with strict full-word matching and automatic suffix expansion (plurals, gerunds, etc.) to avoid false positives.
 
 Once configured, every `skill-tags` sync automatically regenerates the category files from the saved config at `~/.cursor/skill-tags-categories.conf`.
 
+For project-level categories (using only skills in `.agents/skills/`):
+
 ```bash
-# Inject a focused category index instead of the full list:
+skill-tags --categories --local
+```
+
+Then reference focused category indexes instead of the full list:
+
+```bash
 @skills-frontend.md
 @skills-testing.md
 @skills-ai-agents.md
 ```
 
-Predefined categories: `frontend`, `backend`, `database`, `testing`, `design`, `accessibility`, `performance`, `ai-agents`, `devops`, `marketing`, `mobile`, `documentation`. You can also create custom categories with any name.
+Predefined categories: `frontend`, `backend`, `database`, `testing`, `design`, `accessibility`, `performance`, `ai-agents`, `devops`, `marketing`, `mobile`, `documentation`.
 
 ---
 
@@ -109,10 +106,8 @@ Install and configure the `skill-tags` package (npm: https://www.npmjs.com/packa
 Use a terminal that runs outside the sandbox with full permissions to avoid permission errors during install. In Cursor, this means using a non-sandboxed terminal session if available (required_permissions: ["all"] if running via agent shell tools).
 
 Steps to perform:
-1. Install the package: `npm install skill-tags -g`
-2. Run `skill-tags --setup` — when prompted, choose Global and Auto (recommended)
-3. Source my shell rc file or instruct me to do so manually
-4. Run `skill-tags` to perform an initial sync of all installed skills
+1. Install the package: `npm install skill-tags -g` — the setup wizard runs automatically during install; when prompted, choose Global and Auto (recommended)
+2. Source my shell rc file or instruct me to do so manually
 
 When complete, output a summary that includes:
 - Where the command file was generated (~/.cursor/commands/skill-tags.md)
@@ -132,16 +127,14 @@ When complete, output a summary that includes:
 ### Global install (npm)
 
 ```bash
-npm install skill-tags -g
-skill-tags --setup   # choose: Global
+npm install skill-tags -g     # setup wizard runs automatically
 source ~/.zshrc
 ```
 
 ### Project install (npm)
 
 ```bash
-npm install skill-tags --save-dev
-npx skill-tags --setup   # choose: Project
+npm install skill-tags --save-dev    # setup wizard runs automatically
 ```
 
 Adds `"skills": "st-skills"` to `package.json`. Use `npm run skills add <pkg>` to add project skills — auto-syncs `.cursor/commands/project-skill-tags.md` on every change.
@@ -153,7 +146,7 @@ npx skill-tags
 ```
 
 ### Install via curl
-
+ 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/steve-piece/skill-tags/main/install.sh | bash
 ```
@@ -181,11 +174,11 @@ skills add vercel-labs/agent-skills/vercel-react-best-practices
 
 ## Project-Level Install
 
-Install skill-tags as a dev dependency to manage project-specific skills without touching your global shell config. The `--setup` wizard adds a `"skills"` npm script backed by the bundled `st-skills` binary.
+Install skill-tags as a dev dependency to manage project-specific skills without touching your global shell config. The setup wizard runs automatically during install and adds a `"skills"` npm script backed by the bundled `st-skills` binary.
 
 ```bash
 npm install skill-tags --save-dev
-npx skill-tags --setup   # choose: Project
+# choose: Project + Auto when prompted
 ```
 
 After setup, `package.json` will include:
@@ -215,13 +208,15 @@ The `st-skills` binary (from this package) wraps `npx skills`, then automaticall
 ## CLI Reference
 
 ```bash
-skill-tags                # sync all skills, generate/update the command file
-skill-tags --categories   # open interactive category wizard (CRUD)
-skill-tags --setup        # interactive setup: choose Global (shell profile) or Project (package.json)
-skill-tags --global       # skip local skills (.agents/skills in CWD); scan global sources only
-skill-tags --local        # scan only .agents/skills in CWD; write to .cursor/commands/project-skill-tags.md
-skill-tags --version      # print version
-skill-tags --help         # show usage
+skill-tags                       # sync all skills, generate/update the command file
+skill-tags --categories          # open interactive category wizard
+skill-tags --categories --local  # category wizard for project-level skills only
+skill-tags --setup               # re-run setup wizard (runs automatically on first install)
+skill-tags --global              # skip local skills (.agents/skills in CWD); scan global sources only
+skill-tags --local               # scan only .agents/skills in CWD; write to .cursor/commands/project-skill-tags.md
+skill-tags --latest              # update skill-tags to the latest version
+skill-tags --version             # print version
+skill-tags --help                # show usage
 ```
 
 ### `st-skills` (project binary)
@@ -294,6 +289,47 @@ bash uninstall.sh
 - Node.js >=18
 - bash or zsh
 - [Cursor IDE](https://cursor.com)
+
+## Changelog
+
+### v1.5.0
+
+- **`--latest` flag** — run `skill-tags --latest` to check npm for updates and self-update in place
+- **Project-level categories** — `skill-tags --categories --local` runs the category wizard using only project skills (`.agents/skills/`), stores config in `.cursor/skill-tags-categories.conf`, and generates category files in `.cursor/commands/`
+- **Simplified category wizard** — streamlined to three actions: Add categories (multi-select from predefined list), Edit categories (multi-select to remove), and Save changes (runs keyword matching on save)
+- **Quieter sync from wizard** — `sync.sh` accepts `--quiet` to suppress verbose scan output; the category wizard uses it for cleaner post-save output with an aligned summary table
+- **Removed custom category input** — categories are now limited to the predefined list for consistency
+
+### v1.4.0
+
+- Interactive `--categories` wizard with keyword-based auto-assignment
+- Category config persistence at `~/.cursor/skill-tags-categories.conf`
+- Auto-regeneration of category files on every sync
+- Predefined categories: frontend, backend, database, testing, design, accessibility, performance, ai-agents, devops, marketing, mobile, documentation
+
+### v1.3.0
+
+- `--local` flag for project-level skill scanning
+- `st-skills` binary for project-level add/remove/update with auto-sync
+- Project setup mode in `--setup` wizard
+
+### v1.2.0
+
+- `--global` flag to skip local skills
+- `--setup` wizard with Global and Project modes
+- Shell wrapper auto-sync on `skills add/remove`
+
+### v1.1.0
+
+- Deduplication across skill sources (first-found wins by priority)
+- Support for nested plugin cache directories
+- Description extraction from YAML frontmatter and first content line
+
+### v1.0.0
+
+- Initial release
+- Scans all known skill locations and generates `~/.cursor/commands/skill-tags.md`
+- Priority-ordered skill sources with deduplication
 
 ## License
 

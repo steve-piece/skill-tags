@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-VERSION="1.3.0"
+VERSION="1.5.0"
 
 GLOBAL_COMMANDS_DIR="${HOME}/.cursor/commands"
 OUTPUT_FILE="${GLOBAL_COMMANDS_DIR}/skill-tags.md"
@@ -36,11 +36,13 @@ trap 'rm -f "$SKILLS_TEMP"; rm -rf "$SKILLS_META_DIR"' EXIT
 
 GLOBAL_ONLY=false
 PROJECT_ONLY=false
+QUIET=false
 
 for arg in "$@"; do
   case "$arg" in
     --global) GLOBAL_ONLY=true ;;
     --local)  PROJECT_ONLY=true ;;
+    --quiet)  QUIET=true ;;
   esac
 done
 
@@ -49,8 +51,8 @@ done
 count_found=0
 count_dupes=0
 
-log()     { printf "  %s\n" "$*"; }
-success() { printf "  ✓ %s\n" "$*"; }
+log()     { [[ "$QUIET" == "true" ]] || printf "  %s\n" "$*"; }
+success() { [[ "$QUIET" == "true" ]] || printf "  ✓ %s\n" "$*"; }
 
 # Tracks which skill names have already been processed (deduplication).
 # Uses a delimited string for bash 3.2 compatibility (no associative arrays).
@@ -192,10 +194,14 @@ scan_tree() {
 
 # ─── Generate category files ────────────────────────────────────────────────────
 
-# Reads ~/.cursor/skill-tags-categories.conf and writes a skills-<category>.md
-# command file for each category. Called automatically on every sync when config exists.
+# Reads a categories config and writes a skills-<category>.md command file for each.
+# Usage: generate_category_files [config_file] [commands_dir]
+# Defaults to global paths when called without arguments.
 generate_category_files() {
-  [[ -f "$CATEGORIES_CONFIG" ]] || return 0
+  local config_file="${1:-$CATEGORIES_CONFIG}"
+  local commands_dir="${2:-$GLOBAL_COMMANDS_DIR}"
+
+  [[ -f "$config_file" ]] || return 0
 
   local gen_count=0
 
@@ -205,7 +211,7 @@ generate_category_files() {
 
     local title
     title="$(to_title_case "$cat_name")"
-    local out="${GLOBAL_COMMANDS_DIR}/skills-${cat_name}.md"
+    local out="${commands_dir}/skills-${cat_name}.md"
 
     local skills_section=""
     while IFS= read -r sname; do
@@ -247,16 +253,18 @@ EOF
 
     gen_count=$(( gen_count + 1 ))
     success "Generated: ${out/#$HOME/~}"
-  done < "$CATEGORIES_CONFIG"
+  done < "$config_file"
 
-  if [[ $gen_count -gt 0 ]]; then
+  if [[ $gen_count -gt 0 && "$QUIET" != "true" ]]; then
     printf "  Category files: %d generated\n" "$gen_count"
   fi
 }
 
 # ─── Main ──────────────────────────────────────────────────────────────────────
 
-printf "\n  skill-tags v%s — syncing skills\n\n" "$VERSION"
+if [[ "$QUIET" != "true" ]]; then
+  printf "\n  skill-tags v%s — syncing skills\n\n" "$VERSION"
+fi
 
 if [[ "$PROJECT_ONLY" == "true" ]]; then
   # ─── --local: scan only .agents/skills in CWD ───────────────────────────────
@@ -297,14 +305,19 @@ ${OPENING}
 $(cat "$SKILLS_TEMP")
 EOF
 
-  printf "\n"
-  if [[ "$is_update" == "true" ]]; then
-    printf "  ✓ Updated:   .cursor/commands/project-skill-tags.md\n"
-  else
-    printf "  ✓ Generated: .cursor/commands/project-skill-tags.md\n"
+  PROJECT_CATEGORIES_CONFIG="$(pwd)/.cursor/skill-tags-categories.conf"
+  generate_category_files "$PROJECT_CATEGORIES_CONFIG" "$PROJECT_COMMANDS_DIR"
+
+  if [[ "$QUIET" != "true" ]]; then
+    printf "\n"
+    if [[ "$is_update" == "true" ]]; then
+      printf "  ✓ Updated:   .cursor/commands/project-skill-tags.md\n"
+    else
+      printf "  ✓ Generated: .cursor/commands/project-skill-tags.md\n"
+    fi
+    printf "  Skills:      %d indexed\n" "$count_found"
+    printf "\n  Tip: type @project-skill-tags.md in Cursor chat to load the project skills reference.\n\n"
   fi
-  printf "  Skills:      %d indexed\n" "$count_found"
-  printf "\n  Tip: type @project-skill-tags.md in Cursor chat to load the project skills reference.\n\n"
 
 else
   # ─── Default: scan all sources ───────────────────────────────────────────────
@@ -352,16 +365,18 @@ EOF
 
   generate_category_files
 
-  printf "\n"
-  if [[ "$is_update" == "true" ]]; then
-    printf "  ✓ Updated:   %s\n" "${OUTPUT_FILE/#$HOME/~}"
-  else
-    printf "  ✓ Generated: %s\n" "${OUTPUT_FILE/#$HOME/~}"
+  if [[ "$QUIET" != "true" ]]; then
+    printf "\n"
+    if [[ "$is_update" == "true" ]]; then
+      printf "  ✓ Updated:   %s\n" "${OUTPUT_FILE/#$HOME/~}"
+    else
+      printf "  ✓ Generated: %s\n" "${OUTPUT_FILE/#$HOME/~}"
+    fi
+    printf "  Skills:      %d indexed\n" "$count_found"
+    if [[ $count_dupes -gt 0 ]]; then
+      printf "  Duplicates:  %d skipped (covered by higher-priority source)\n" "$count_dupes"
+    fi
+    printf "\n  Tip: type @skill-tags.md in Cursor chat to load the full skills reference.\n\n"
   fi
-  printf "  Skills:      %d indexed\n" "$count_found"
-  if [[ $count_dupes -gt 0 ]]; then
-    printf "  Duplicates:  %d skipped (covered by higher-priority source)\n" "$count_dupes"
-  fi
-  printf "\n  Tip: type @skill-tags.md in Cursor chat to load the full skills reference.\n\n"
 
 fi

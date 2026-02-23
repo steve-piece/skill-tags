@@ -1,1 +1,22 @@
 node_modules/
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Cursor generated
+.cursor/commands/*
+.cursor/skill-tags-categories.conf
+.agents/*
+.claude/*
+# Env
+.env
+.env.*

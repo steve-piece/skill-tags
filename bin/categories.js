@@ -5,17 +5,25 @@
 
 'use strict';
 
-const { checkbox, select, input, confirm } = require('@inquirer/prompts');
+const { checkbox, select } = require('@inquirer/prompts');
 const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
 const HOME = os.homedir();
-const CATEGORIES_CONFIG = path.join(HOME, '.cursor', 'skill-tags-categories.conf');
-const COMMANDS_DIR = path.join(HOME, '.cursor', 'commands');
-const SKILL_TAGS_FILE = path.join(COMMANDS_DIR, 'skill-tags.md');
+const IS_LOCAL = process.argv.includes('--local');
 const SYNC_SCRIPT = path.join(__dirname, '..', 'sync.sh');
+
+const CATEGORIES_CONFIG = IS_LOCAL
+  ? path.join(process.cwd(), '.cursor', 'skill-tags-categories.conf')
+  : path.join(HOME, '.cursor', 'skill-tags-categories.conf');
+const COMMANDS_DIR = IS_LOCAL
+  ? path.join(process.cwd(), '.cursor', 'commands')
+  : path.join(HOME, '.cursor', 'commands');
+const SKILL_TAGS_FILE = IS_LOCAL
+  ? path.join(process.cwd(), '.cursor', 'commands', 'project-skill-tags.md')
+  : path.join(HOME, '.cursor', 'commands', 'skill-tags.md');
 
 const PREDEFINED_CATEGORIES = [
   'frontend',
@@ -119,8 +127,10 @@ const CATEGORY_KEYWORDS = {
 
 function ensureSkillTagsFile() {
   if (fs.existsSync(SKILL_TAGS_FILE)) return;
-  console.log('  skill-tags.md not found — running initial sync...\n');
-  spawnSync('bash', [SYNC_SCRIPT], { stdio: 'inherit' });
+  const label = IS_LOCAL ? 'project-skill-tags.md' : 'skill-tags.md';
+  console.log(`  ${label} not found — running initial sync...\n`);
+  const args = IS_LOCAL ? [SYNC_SCRIPT, '--local'] : [SYNC_SCRIPT];
+  spawnSync('bash', args, { stdio: 'inherit' });
 }
 
 function loadSkillsFromIndex() {
@@ -214,36 +224,20 @@ function toTitleCase(str) {
 
 // ─── Wizard actions ──────────────────────────────────────────────────────────
 
-async function addCategories(skills, config) {
+async function addCategories(config) {
   const existing = new Set(Object.keys(config));
   const available = PREDEFINED_CATEGORIES.filter(c => !existing.has(c));
 
-  let selected = [];
-  if (available.length > 0) {
-    selected = await checkbox({
-      message: 'Select categories to add (space to toggle)',
-      choices: available.map(c => ({ name: toTitleCase(c), value: c })),
-      pageSize: 14,
-    });
-  } else {
-    console.log('\n  All predefined categories already exist.');
+  if (available.length === 0) {
+    console.log('\n  All categories already added.\n');
+    return;
   }
 
-  const custom = await input({
-    message: 'Custom category name (blank to skip):',
+  const selected = await checkbox({
+    message: 'Select categories to add (space to toggle)',
+    choices: available.map(c => ({ name: toTitleCase(c), value: c })),
+    pageSize: 14,
   });
-
-  if (custom.trim()) {
-    const normalized = custom.trim().toLowerCase()
-      .replace(/[^a-z0-9-]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-    if (normalized && !existing.has(normalized)) {
-      selected.push(normalized);
-    } else if (existing.has(normalized)) {
-      console.log(`  "${normalized}" already exists — use Edit instead.`);
-    }
-  }
 
   if (selected.length === 0) {
     console.log('  No categories selected.\n');
@@ -251,58 +245,43 @@ async function addCategories(skills, config) {
   }
 
   for (const cat of selected) {
-    const matched = skills.filter(s => matchKeywords(s, cat));
-    config[cat] = matched.map(s => s.name);
-    console.log(`  ✓ ${toTitleCase(cat)}: ${matched.length} skill(s) auto-assigned\n`);
+    config[cat] = [];
+    console.log(`  + ${toTitleCase(cat)}`);
   }
+  console.log();
 }
 
-async function editCategory(skills, config) {
+async function editCategories(config) {
   const cats = Object.keys(config);
   if (cats.length === 0) {
-    console.log('  No categories yet. Add one first.\n');
+    console.log('  No categories yet. Add some first.\n');
     return;
   }
 
-  const cat = await select({
-    message: 'Which category to edit?',
+  const kept = await checkbox({
+    message: 'Uncheck categories to remove (space to toggle)',
     choices: cats.map(c => ({
       name: `${toTitleCase(c)} (${config[c].length} skills)`,
       value: c,
+      checked: true,
     })),
+    pageSize: 14,
   });
 
-  const matched = skills.filter(s => matchKeywords(s, cat));
-  config[cat] = matched.map(s => s.name);
-  console.log(`  ✓ Re-generated ${toTitleCase(cat)}: ${matched.length} skill(s) auto-assigned\n`);
-}
+  const keptSet = new Set(kept);
+  const removed = cats.filter(c => !keptSet.has(c));
 
-async function deleteCategory(config) {
-  const cats = Object.keys(config);
-  if (cats.length === 0) {
-    console.log('  No categories yet.\n');
-    return;
-  }
-
-  const cat = await select({
-    message: 'Which category to delete?',
-    choices: cats.map(c => ({
-      name: `${toTitleCase(c)} (${config[c].length} skills)`,
-      value: c,
-    })),
-  });
-
-  const yes = await confirm({
-    message: `Delete "${cat}" and its generated command file?`,
-    default: false,
-  });
-
-  if (yes) {
+  for (const cat of removed) {
     delete config[cat];
     const genFile = path.join(COMMANDS_DIR, `skills-${cat}.md`);
     try { fs.unlinkSync(genFile); } catch {}
-    console.log(`  ✓ Deleted: ${cat}\n`);
+    console.log(`  - Removed: ${toTitleCase(cat)}`);
   }
+
+  if (removed.length === 0) {
+    console.log('  No changes.');
+  }
+  console.log();
 }
 
 function printCurrentCategories(config) {
@@ -321,11 +300,13 @@ function printCurrentCategories(config) {
 // ─── Main loop ───────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log('\n  skill-tags: category wizard\n');
+  const mode = IS_LOCAL ? 'project' : 'global';
+  const indexFile = IS_LOCAL ? 'project-skill-tags.md' : 'skill-tags.md';
+  console.log(`\n  skill-tags: category wizard (${mode})\n`);
 
   ensureSkillTagsFile();
 
-  console.log('  Loading skills from skill-tags.md...');
+  console.log(`  Loading skills from ${indexFile}...`);
   const skills = loadSkillsFromIndex();
   console.log(`  Found ${skills.length} skill(s)\n`);
 
@@ -338,30 +319,60 @@ async function main() {
       message: 'What would you like to do?',
       choices: [
         { name: 'Add categories', value: 'add' },
-        { name: 'Edit a category', value: 'edit' },
-        { name: 'Delete a category', value: 'delete' },
-        { name: 'Save & generate files', value: 'save' },
+        { name: 'Edit categories', value: 'edit' },
+        { name: 'Save changes', value: 'save' },
         { name: 'Quit without saving', value: 'quit' },
       ],
     });
 
     switch (action) {
       case 'add':
-        await addCategories(skills, config);
+        await addCategories(config);
         break;
       case 'edit':
-        await editCategory(skills, config);
-        break;
-      case 'delete':
-        await deleteCategory(config);
+        await editCategories(config);
         break;
       case 'save': {
-        writeConfig(config);
-        console.log('\n  Config saved. Running sync...\n');
-        const result = spawnSync('bash', [SYNC_SCRIPT], { stdio: 'inherit' });
-        if (result.error) {
-          console.error(`  Error running sync: ${result.error.message}`);
+        const cats = Object.keys(config);
+        if (cats.length === 0) {
+          console.log('  No categories to save.\n');
+          break;
         }
+
+        const pad = Math.max(...cats.map(c => toTitleCase(c).length));
+
+        console.log();
+        console.log('  ┌─ Matching skills to categories ─────────────────');
+        for (const cat of cats) {
+          const matched = skills.filter(s => matchKeywords(s, cat));
+          config[cat] = matched.map(s => s.name);
+          const label = toTitleCase(cat).padEnd(pad);
+          const count = String(matched.length).padStart(2);
+          console.log(`  │  ✓ ${label}  ${count} skill${matched.length === 1 ? '' : 's'}`);
+        }
+        console.log('  └─────────────────────────────────────────────────');
+
+        writeConfig(config);
+
+        const syncArgs = IS_LOCAL
+          ? [SYNC_SCRIPT, '--local', '--quiet']
+          : [SYNC_SCRIPT, '--quiet'];
+        console.log(`\n  Syncing ${skills.length} skills...\n`);
+        const result = spawnSync('bash', syncArgs, { stdio: 'inherit' });
+        if (result.error) {
+          console.error(`  Error: ${result.error.message}`);
+          process.exit(1);
+        }
+
+        const configPath = IS_LOCAL
+          ? '.cursor/skill-tags-categories.conf'
+          : '~/.cursor/skill-tags-categories.conf';
+        console.log(`  ✓ Config saved → ${configPath}`);
+        console.log(`  ✓ ${cats.length} category file${cats.length === 1 ? '' : 's'} generated`);
+        for (const cat of cats) {
+          console.log(`    @skills-${cat}.md`);
+        }
+        console.log(`\n  Tip: type @skills-<category>.md in Cursor chat to use a category.\n`);
         process.exit(result.status ?? 0);
       }
       case 'quit':
