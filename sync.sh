@@ -7,13 +7,13 @@
 
 set -euo pipefail
 
-VERSION="1.2.1"
+VERSION="1.3.0"
 
 GLOBAL_COMMANDS_DIR="${HOME}/.cursor/commands"
 OUTPUT_FILE="${GLOBAL_COMMANDS_DIR}/skill-tags.md"
 CATEGORIES_CONFIG="${HOME}/.cursor/skill-tags-categories.conf"
 PROJECT_COMMANDS_DIR="$(pwd)/.cursor/commands"
-PROJECT_OUTPUT_FILE="${PROJECT_COMMANDS_DIR}/skill-tags.md"
+PROJECT_OUTPUT_FILE="${PROJECT_COMMANDS_DIR}/project-skill-tags.md"
 
 # ─── Priority-ordered skill source directories ─────────────────────────────────
 # Earlier entries take priority when the same skill name exists in multiple locations.
@@ -39,8 +39,8 @@ PROJECT_ONLY=false
 
 for arg in "$@"; do
   case "$arg" in
-    --global-only)  GLOBAL_ONLY=true ;;
-    --project-only) PROJECT_ONLY=true ;;
+    --global) GLOBAL_ONLY=true ;;
+    --local)  PROJECT_ONLY=true ;;
   esac
 done
 
@@ -259,7 +259,7 @@ EOF
 printf "\n  skill-tags v%s — syncing skills\n\n" "$VERSION"
 
 if [[ "$PROJECT_ONLY" == "true" ]]; then
-  # ─── --project-only: scan only .agents/skills in CWD ────────────────────────
+  # ─── --local: scan only .agents/skills in CWD ───────────────────────────────
   PROJECT_SKILLS_DIR="$(pwd)/.agents/skills"
 
   if [[ ! -d "$PROJECT_SKILLS_DIR" ]]; then
@@ -299,12 +299,12 @@ EOF
 
   printf "\n"
   if [[ "$is_update" == "true" ]]; then
-    printf "  ✓ Updated:   .cursor/commands/skill-tags.md\n"
+    printf "  ✓ Updated:   .cursor/commands/project-skill-tags.md\n"
   else
-    printf "  ✓ Generated: .cursor/commands/skill-tags.md\n"
+    printf "  ✓ Generated: .cursor/commands/project-skill-tags.md\n"
   fi
   printf "  Skills:      %d indexed\n" "$count_found"
-  printf "\n  Tip: type @skill-tags.md in Cursor chat to load the project skills reference.\n\n"
+  printf "\n  Tip: type @project-skill-tags.md in Cursor chat to load the project skills reference.\n\n"
 
 else
   # ─── Default: scan all sources ───────────────────────────────────────────────

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // bin/postinstall.js
-// Runs automatically after `npm install -g skill-tags`.
-// Performs an initial sync of any already-installed skills.
+// Runs automatically after `npm install skill-tags`.
+// Global installs: perform initial sync. Local installs: print setup guidance.
 // Never throws — a failed postinstall should never break npm install.
 
 'use strict';
@@ -15,11 +15,17 @@ if (process.platform === 'win32') {
   process.exit(0);
 }
 
-// Skip on local (non-global) installs to avoid running on every `npm install`
-// in a project. npm sets npm_config_global=true for -g installs.
-if (process.env.npm_config_global !== 'true') {
+const isGlobal = process.env.npm_config_global === 'true';
+
+if (!isGlobal) {
+  // Project (local) install — print setup guidance and exit cleanly
+  console.log('\n  skill-tags installed as a project dependency.');
+  console.log('  Run setup to add the "skills" npm script to your package.json:\n');
+  console.log('    npx skill-tags --setup\n');
   process.exit(0);
 }
+
+// ─── Global install: run initial sync ────────────────────────────────────────
 
 const syncScript = path.join(__dirname, '..', 'sync.sh');
 

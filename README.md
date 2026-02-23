@@ -16,6 +16,7 @@ If you're interested in contributing to Cursor Kits, please let me know!
 - [Agent Setup Prompt](#agent-setup-prompt)
 - [Install Options](#install-options)
 - [How It Works](#how-it-works)
+- [Project-Level Install](#project-level-install)
 - [CLI Reference](#cli-reference)
 - [Manual Sync](#manual-sync)
 - [Skill Sources Scanned](#skill-sources-scanned)
@@ -29,23 +30,38 @@ If you're interested in contributing to Cursor Kits, please let me know!
 
 ## Quick Start
 
+### Global (recommended for most users)
+
+1. **Install:** `npm install skill-tags -g`
+2. **Setup:** `skill-tags --setup` → choose **Global** → `source ~/.zshrc`
+3. **Sync:** `skill-tags` (generates the command file)
+4. **Use:** Reference `@skill-tags.md` in any Cursor chat
+
 ```bash
-# Install
 npm install skill-tags -g
-
-# Add the shell auto-trigger wrapper
-skill-tags --setup
+skill-tags --setup   # choose: Global
 source ~/.zshrc
-
-# Initial sync (generate command file)
 skill-tags
+```
+
+### Project-level
+
+1. **Install:** `npm install skill-tags --save-dev`
+2. **Setup:** `npx skill-tags --setup` → choose **Project**
+3. **Use:** Reference `@project-skill-tags.md` in Cursor chat
+
+```bash
+npm install skill-tags --save-dev
+npx skill-tags --setup   # choose: Project — adds "skills" script to package.json
+
+npm run skills add owner/repo/skill-name   # adds skill + auto-syncs
 ```
 
 ## Usage
 
 In any Cursor chat, attach the full index of your skills by referencing the generated command file:
 
-- `@skill-tags.md`
+- `@skill-tags.md` (global) or `@project-skill-tags.md` (local, from `skill-tags --local`)
 
 Example:
 
@@ -94,9 +110,9 @@ Use a terminal that runs outside the sandbox with full permissions to avoid perm
 
 Steps to perform:
 1. Install the package: `npm install skill-tags -g`
-2. Run `skill-tags --setup` to install the `skills()` shell wrapper in my rc file (~/.zshrc or ~/.bash_profile)
-3. Run `skill-tags` to perform an initial sync of all installed skills
-4. Source my shell rc file or instruct me to do so manually
+2. Run `skill-tags --setup` — when prompted, choose Global and Auto (recommended)
+3. Source my shell rc file or instruct me to do so manually
+4. Run `skill-tags` to perform an initial sync of all installed skills
 
 When complete, output a summary that includes:
 - Where the command file was generated (~/.cursor/commands/skill-tags.md)
@@ -113,13 +129,22 @@ When complete, output a summary that includes:
 
 ## Install Options
 
-### Install via npm
+### Global install (npm)
 
 ```bash
 npm install skill-tags -g
-skill-tags --setup
+skill-tags --setup   # choose: Global
 source ~/.zshrc
 ```
+
+### Project install (npm)
+
+```bash
+npm install skill-tags --save-dev
+npx skill-tags --setup   # choose: Project
+```
+
+Adds `"skills": "st-skills"` to `package.json`. Use `npm run skills add <pkg>` to add project skills — auto-syncs `.cursor/commands/project-skill-tags.md` on every change.
 
 ### One-off run (no install)
 
@@ -141,30 +166,73 @@ source ~/.zshrc   # or ~/.bash_profile / ~/.bashrc
 
 ## How It Works
 
-After setup, the `skills` command wraps `npx skills` and automatically runs a sync after every `skills add` or `skills remove`:
+After global setup, the `skills` command wraps `npx skills` and automatically runs a sync after every `skills add` or `skills remove`:
 
 ```bash
 # Install (or remove) a skill — sync runs automatically
 skills add vercel-labs/agent-skills/vercel-react-best-practices
 
-# The single command file is updated:
+# The command file is updated:
 # ~/.cursor/commands/skill-tags.md
 
 # Use it in Cursor chat:
 # @skill-tags.md
 ```
 
+## Project-Level Install
+
+Install skill-tags as a dev dependency to manage project-specific skills without touching your global shell config. The `--setup` wizard adds a `"skills"` npm script backed by the bundled `st-skills` binary.
+
+```bash
+npm install skill-tags --save-dev
+npx skill-tags --setup   # choose: Project
+```
+
+After setup, `package.json` will include:
+
+```json
+"scripts": {
+  "skills": "st-skills"
+}
+```
+
+Use `npm run skills` to add, remove, or update project skills:
+
+```bash
+npm run skills add owner/repo/skill-name     # adds skill + auto-syncs
+npm run skills remove owner/repo/skill-name  # removes skill + auto-syncs
+npm run skills update owner/repo/skill-name  # updates skill + auto-syncs
+
+# Manual re-sync:
+skill-tags --local
+
+# Use in Cursor chat:
+# @project-skill-tags.md
+```
+
+The `st-skills` binary (from this package) wraps `npx skills`, then automatically runs `skill-tags --local` on every successful `add`, `remove`, or `update`, writing the index to `.cursor/commands/project-skill-tags.md`.
+
 ## CLI Reference
 
 ```bash
 skill-tags                # sync all skills, generate/update the command file
 skill-tags --categories   # open interactive category wizard (CRUD)
-skill-tags --setup        # install skills() shell wrapper in ~/.zshrc
-skill-tags --global-only  # skip project-level skills (.agents/skills in CWD)
-skill-tags --project-only # scan only .agents/skills in CWD; write to .cursor/commands/skill-tags.md
+skill-tags --setup        # interactive setup: choose Global (shell profile) or Project (package.json)
+skill-tags --global       # skip local skills (.agents/skills in CWD); scan global sources only
+skill-tags --local        # scan only .agents/skills in CWD; write to .cursor/commands/project-skill-tags.md
 skill-tags --version      # print version
 skill-tags --help         # show usage
 ```
+
+### `st-skills` (project binary)
+
+```bash
+npm run skills add <pkg>     # install a project skill + auto-sync
+npm run skills remove <pkg>  # remove a project skill + auto-sync
+npm run skills update <pkg>  # update a project skill + auto-sync
+```
+
+`st-skills` is registered in `package.json` by `skill-tags --setup` (local mode). It wraps `npx skills` and calls `skill-tags --local` after every mutating command.
 
 ## Manual Sync
 
@@ -192,7 +260,7 @@ Skills are discovered from all of these locations automatically. When the same s
 
 ## Generated File Format
 
-The `~/.cursor/commands/skill-tags.md` contains:
+The `~/.cursor/commands/skill-tags.md` (global) and `./.cursor/commands/project-skill-tags.md` (local) contain:
 
 - An opening instruction for the agent to assess all skills and apply them autonomously.
 - Instructions for the agent on how to plan with skills when in Plan Mode.

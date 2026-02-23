@@ -1,9 +1,10 @@
 {
   "name": "skill-tags",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Generates consolidated command files (@skill-tags.md and custom @skills-<category>.md indexes) for all installed Cursor skills.",
   "bin": {
-    "skill-tags": "bin/skill-tags.js"
+    "skill-tags": "bin/skill-tags.js",
+    "st-skills": "bin/st-skills.js"
   },
   "scripts": {
     "postinstall": "node ./bin/postinstall.js"

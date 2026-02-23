@@ -212,11 +212,6 @@ function toTitleCase(str) {
   return str.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-function truncate(str, len) {
-  if (!str || str.length <= len) return str || '';
-  return str.slice(0, len - 1) + '…';
-}
-
 // ─── Wizard actions ──────────────────────────────────────────────────────────
 
 async function addCategories(skills, config) {
@@ -256,25 +251,9 @@ async function addCategories(skills, config) {
   }
 
   for (const cat of selected) {
-    const skillChoices = skills.map(s => {
-      const match = matchKeywords(s, cat);
-      const hint = match ? ` — ${match.reason}` : '';
-      return {
-        name: `${s.name}${hint}`,
-        value: s.name,
-        checked: !!match,
-        description: truncate(s.description, 60),
-      };
-    });
-
-    const selectedSkills = await checkbox({
-      message: `Select skills for "${cat}" (space to toggle)`,
-      choices: skillChoices,
-      pageSize: 15,
-    });
-
-    config[cat] = selectedSkills;
-    console.log(`  ✓ ${toTitleCase(cat)}: ${selectedSkills.length} skill(s)\n`);
+    const matched = skills.filter(s => matchKeywords(s, cat));
+    config[cat] = matched.map(s => s.name);
+    console.log(`  ✓ ${toTitleCase(cat)}: ${matched.length} skill(s) auto-assigned\n`);
   }
 }
 
@@ -293,26 +272,9 @@ async function editCategory(skills, config) {
     })),
   });
 
-  const currentSet = new Set(config[cat] || []);
-  const skillChoices = skills.map(s => {
-    const match = matchKeywords(s, cat);
-    const hint = match ? ` — ${match.reason}` : '';
-    return {
-      name: `${s.name}${hint}`,
-      value: s.name,
-      checked: currentSet.has(s.name),
-      description: truncate(s.description, 60),
-    };
-  });
-
-  const selectedSkills = await checkbox({
-    message: `Select skills for "${cat}" (space to toggle)`,
-    choices: skillChoices,
-    pageSize: 15,
-  });
-
-  config[cat] = selectedSkills;
-  console.log(`  ✓ Updated ${toTitleCase(cat)}: ${selectedSkills.length} skill(s)\n`);
+  const matched = skills.filter(s => matchKeywords(s, cat));
+  config[cat] = matched.map(s => s.name);
+  console.log(`  ✓ Re-generated ${toTitleCase(cat)}: ${matched.length} skill(s) auto-assigned\n`);
 }
 
 async function deleteCategory(config) {
