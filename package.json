@@ -1,6 +1,6 @@
 {
   "name": "skill-tags",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Generates consolidated command files (@skill-tags.md and custom @skills-<category>.md indexes) for all installed Cursor skills.",
   "bin": {
     "skill-tags": "bin/skill-tags.js"
@@ -40,7 +40,6 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@inquirer/prompts": "^8.2.1",
-    "skill-tags": "^1.2.0"
+    "@inquirer/prompts": "^8.2.1"
   }
 }

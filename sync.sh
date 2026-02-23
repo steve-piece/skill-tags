@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-VERSION="1.2.0"
+VERSION="1.2.1"
 
 GLOBAL_COMMANDS_DIR="${HOME}/.cursor/commands"
 OUTPUT_FILE="${GLOBAL_COMMANDS_DIR}/skill-tags.md"
